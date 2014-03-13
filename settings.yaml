@@ -19,7 +19,7 @@ HEADERS:
 
 VALIDATE:
     EMAIL: 你的邮箱
-    PASSWORD: 你的密码
+    PASSWORD: 你的密码 
 
 DB:
     FILE: db.txt

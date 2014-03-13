@@ -65,10 +65,13 @@ class ZhiHuQuestions(object):
         return self.se.cookies.get('_xsrf')
 
     def login(self):
-        url_login = self.configs['URL']['LOGIN']        
+        url_login = self.configs['URL']['LOGIN']
+        xsrf_token = self._get_xsrf()
         payload_login = {
             'email': self.configs['VALIDATE']['EMAIL'],
             'password': self.configs['VALIDATE']['PASSWORD'],
+            '_xsrf': xsrf_token,
+            'rememberme': 'y',
         }
         self.se.post(url_login, payload_login)
 
