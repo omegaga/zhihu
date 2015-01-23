@@ -1,13 +1,15 @@
 URL:
+    LOGINPAGE: http://www.zhihu.com/#signin
     LOGIN: http://www.zhihu.com/login
     QUESTIONS: http://www.zhihu.com/log/questions
     HOME: http://www.zhihu.com
+    CAPTCHA-PREFIX: http://www.zhihu.com
 
 HEADERS:
     INIT:
         Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
-        Accept-Encoding: gzip,deflate,sdch
-        Accept-Language: en-US,en;q=0.8
+        Accept-Encoding: gzip,deflate
+        Accept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2
         Connection: keep-alive
         Host: www.zhihu.com
         Referer: http://www.zhihu.com/log/recent
@@ -19,12 +21,13 @@ HEADERS:
 
 VALIDATE:
     EMAIL: 你的邮箱
-    PASSWORD: 你的密码 
+    PASSWORD: 你的密码
 
 DB:
     FILE: db.txt
 
 NODES:
+    CAPTCHA: //img[@class='js-captcha-img']
     TEST: //a[@id='top-nav-dd-topic']
     PAGE: //div[@class='zm-item']
     JSON: /html/body/div

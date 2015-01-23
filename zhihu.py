@@ -19,6 +19,8 @@ import requests
 import lxml
 import lxml.html
 from lxml import etree
+import cStringIO
+from PIL import Image
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s][%(levelname)s] %(message)s',
@@ -30,7 +32,7 @@ class ZhiHuQuestions(object):
     Mainly from http://www.zhihu.com/log/questions"""
     def __init__(self):
         self.configs = self._get_configs()
-        
+
         self.se = requests.session()
         self._init_header()
 
@@ -64,7 +66,16 @@ class ZhiHuQuestions(object):
     def _get_xsrf(self):
         return self.se.cookies.get('_xsrf')
 
+    def _show_image(self, url):
+        res = self.se.get(url)
+        img_file = cStringIO.StringIO(res.content)
+        img = Image.open(img_file)
+        img.show()
+
     def login(self):
+        res = self.se.get(self.configs['URL']['LOGINPAGE'])
+        html = etree.HTML(res.content)
+
         url_login = self.configs['URL']['LOGIN']
         xsrf_token = self._get_xsrf()
         payload_login = {
@@ -73,7 +84,25 @@ class ZhiHuQuestions(object):
             '_xsrf': xsrf_token,
             'rememberme': 'y',
         }
-        self.se.post(url_login, payload_login)
+
+        captcha_prefix = self.configs['URL']['CAPTCHA-PREFIX']
+
+        while True:
+            res = self.se.post(url_login, payload_login)
+            html = etree.HTML(res.content)
+            captcha_node = html.xpath(self.configs['NODES']['CAPTCHA'])
+            require_captcha = len(captcha_node) != 0 and\
+                'src' in captcha_node[0].attrib
+            if not require_captcha:
+                break
+
+            captcha_link = captcha_prefix + captcha_node[0].attrib['src']
+            self._show_image(captcha_link)
+            captcha = raw_input('Please enter the CAPTCHA: ')
+            payload_login['captcha'] = captcha
+
+            xsrf_token = self._get_xsrf()
+            payload_login['_xsrf'] = xsrf_token
 
     def has_login(self):
         # !!! If the homepage of zhihu has changed, this may need to
